@@ -9,16 +9,28 @@ class App extends Component {
       inputValue: '',
       inputUsernameValue: ''
     }
+    this.refreshMessages = this.refreshMessages.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleUsernameSubmit = this.handleUsernameSubmit.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+    this.handleUsernameChange = this.handleUsernameChange.bind(this)
   }
-  componentDidMount = () => {
+  componentDidMount() {
     setInterval(this.refreshMessages, 500);
   }
-  refreshMessages = () => {
+  refreshMessages() {
+    let cb = function (resBody) {
+      let msgs = JSON.parse(resBody)
+      this.setState({ messages: msgs })
+    }
+    cb = cb.bind(this)
     fetch('/messages')
-      .then(res => res.json())
-      .then(msgs => this.setState({ messages: msgs }))
+      .then(function (res) {
+        return res.text()
+      })
+      .then(cb)
   }
-  handleSubmit = event => {
+  handleSubmit(event) {
     event.preventDefault();
     let bod = JSON.stringify({
       username: this.state.username,
@@ -31,20 +43,20 @@ class App extends Component {
 
   }
 
-  handleUsernameSubmit = event => {
+  handleUsernameSubmit(event) {
     event.preventDefault();
     this.setState({ username: this.state.inputUsernameValue })
 
   }
 
-  handleChange = event => {
+  handleChange(event) {
     this.setState({ inputValue: event.target.value })
   }
 
-  handleUsernameChange = event => {
+  handleUsernameChange(event) {
     this.setState({ inputUsernameValue: event.target.value })
   }
-  askForUsername = () => {
+  askForUsername() {
     return (<div>
       What's your username?
       <form onSubmit={this.handleUsernameSubmit}>
